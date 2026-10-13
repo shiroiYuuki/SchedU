@@ -1,0 +1,6 @@
+{
+  "name": "schedU - Jadwal Kuliah & Peminjaman Ruangan",
+  "description": "Platform pengecekan jadwal kuliah jurusan, pencarian ruangan kosong secara real-time, dan peminjaman ruangan praktis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
