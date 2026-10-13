@@ -4,7 +4,13 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  // Support flexible base path for GitHub Pages subfolder deployment (e.g. /repo-name/ or relative ./)
+  // Using './' ensures assets always resolve correctly regardless of whether the site is served from
+  // the root domain (username.github.io) or a project subpath (username.github.io/repo-name/).
+  const base = process.env.VITE_BASE_PATH || (process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : './');
+
   return {
+    base,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -20,3 +26,4 @@ export default defineConfig(() => {
     },
   };
 });
+

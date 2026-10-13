@@ -271,6 +271,10 @@ export default function App() {
               </span>
               <span className="text-stone-300 dark:text-stone-700" aria-hidden="true">·</span>
               <span>Sistem Ruang & Jadwal Kuliah Jurusan</span>
+              <span className="text-stone-300 dark:text-stone-700" aria-hidden="true">·</span>
+              <span className="font-mono text-[11px] font-medium text-stone-400 dark:text-stone-500 px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/60">
+                v1.0
+              </span>
             </div>
 
             <div className="flex items-center gap-2 text-stone-500 dark:text-stone-400">

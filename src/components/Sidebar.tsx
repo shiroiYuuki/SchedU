@@ -215,9 +215,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Pemilih Tema: Dark Mode / Light Mode / Sistem */}
         <div className="flex items-center justify-between px-1">
-          <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
-            Tema Antarmuka
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
+              Tema Antarmuka
+            </span>
+            <span className="font-mono text-[10px] text-stone-400 dark:text-stone-500 px-1 py-0.2 rounded bg-stone-200/50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700/60">
+              v1.0
+            </span>
+          </div>
           <ThemeToggle theme={theme} setTheme={setTheme} isDark={isDark} />
         </div>
       </div>
