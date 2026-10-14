@@ -4,11 +4,21 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
-  // Respect verified base path from GitHub Pages configure-pages action,
-  // explicit VITE_BASE_PATH, or fallback to universal relative './'
-  let base = process.env.BASE_URL || process.env.VITE_BASE_PATH || './';
-  if (base !== './' && !base.endsWith('/')) {
-    base = `${base}/`;
+  // Support GitHub Pages repository subfolder deployment (e.g. /SchedU/)
+  // Priority: 1. VITE_BASE_PATH, 2. GITHUB_REPOSITORY (<owner>/<repo> -> /<repo>/),
+  // 3. BASE_URL if non-root, 4. Fallback relative './'
+  let base = process.env.VITE_BASE_PATH;
+  if (!base && process.env.GITHUB_REPOSITORY) {
+    const repoName = process.env.GITHUB_REPOSITORY.split('/')[1];
+    if (repoName) {
+      base = repoName.endsWith('.github.io') ? '/' : `/${repoName}/`;
+    }
+  }
+  if (!base && process.env.BASE_URL && process.env.BASE_URL !== '/') {
+    base = process.env.BASE_URL.endsWith('/') ? process.env.BASE_URL : `${process.env.BASE_URL}/`;
+  }
+  if (!base) {
+    base = './';
   }
 
   return {

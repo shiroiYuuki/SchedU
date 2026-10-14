@@ -36,6 +36,7 @@ jobs:
       - name: Build SchedU
         run: bun run build
         env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
           BASE_URL: ${{ steps.pages.outputs.base_path }}
 
       - name: Upload artifact
