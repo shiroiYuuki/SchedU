@@ -4,22 +4,11 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
-  // Support GitHub Pages repository subfolder deployment (e.g. /SchedU/)
-  // Priority: 1. VITE_BASE_PATH, 2. GITHUB_REPOSITORY (<owner>/<repo> -> /<repo>/),
-  // 3. BASE_URL if non-root, 4. Fallback relative './'
-  let base = process.env.VITE_BASE_PATH;
-  if (!base && process.env.GITHUB_REPOSITORY) {
-    const repoName = process.env.GITHUB_REPOSITORY.split('/')[1];
-    if (repoName) {
-      base = repoName.endsWith('.github.io') ? '/' : `/${repoName}/`;
-    }
-  }
-  if (!base && process.env.BASE_URL && process.env.BASE_URL !== '/') {
-    base = process.env.BASE_URL.endsWith('/') ? process.env.BASE_URL : `${process.env.BASE_URL}/`;
-  }
-  if (!base) {
-    base = './';
-  }
+  // Universal relative base path ensures assets resolve correctly in any deployment:
+  // - Subfolder (e.g. https://username.github.io/SchedU/)
+  // - Root domain (e.g. https://username.github.io/)
+  // - Custom domain or preview environment
+  const base = process.env.VITE_BASE_PATH || './';
 
   return {
     base,
@@ -38,4 +27,3 @@ export default defineConfig(() => {
     },
   };
 });
-
