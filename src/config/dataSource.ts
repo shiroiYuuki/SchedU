@@ -43,9 +43,13 @@ export const GOOGLE_SHEETS_CSV_URL = SCHEDULE_SOURCE_CONFIG.csvUrl;
  * Jangan pernah memasukkan SERVICE ROLE SECRET KEY di frontend!
  */
 export const DATABASE_CONFIG = {
-  // Ambil dari environment variable jika ada, atau gunakan nilai konfigurasi lokal
-  supabaseUrl: (import.meta.env.VITE_SUPABASE_URL as string) || '',
-  supabaseAnonKey: (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '',
+  // Ambil dari environment variable jika ada, atau gunakan nilai default proyek
+  supabaseUrl:
+    (import.meta.env.VITE_SUPABASE_URL as string) ||
+    'https://whnvdgrtefntxyllehkd.supabase.co',
+  supabaseAnonKey:
+    (import.meta.env.VITE_SUPABASE_ANON_KEY as string) ||
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobnZkZ3J0ZWZudHh5bGxlaGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzUyMjgsImV4cCI6MjEwNzcxMTIyOH0.BpUDk7UUkbdcZ0zts6XYAsNbSpGWShTittSAD_4ihn8',
 
   // Nama tabel peminjaman di Supabase
   tableName: 'peminjaman_ruangan',

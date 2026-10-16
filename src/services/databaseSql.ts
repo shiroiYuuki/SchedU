@@ -35,20 +35,22 @@ FOR SELECT
 TO public
 USING (true);
 
--- - Hanya mahasiswa yang telah LOGIN (authenticated) yang boleh mengajukan peminjaman
+-- - Pengguna (mahasiswa terdaftar maupun tamu) dapat membuat pengajuan peminjaman
+DROP POLICY IF EXISTS "Siapapun dapat membuat peminjaman" ON public.peminjaman_ruangan;
 DROP POLICY IF EXISTS "Hanya user login yang dapat membuat peminjaman" ON public.peminjaman_ruangan;
-CREATE POLICY "Hanya user login yang dapat membuat peminjaman"
+CREATE POLICY "Siapapun dapat membuat peminjaman"
 ON public.peminjaman_ruangan
 FOR INSERT
-TO authenticated
+TO anon, authenticated
 WITH CHECK (true);
 
--- - Pengguna login dapat membatalkan/mengubah status peminjaman mereka
+-- - Pengguna dapat memperbarui/membatalkan status peminjaman
 DROP POLICY IF EXISTS "User login dapat membatalkan peminjaman" ON public.peminjaman_ruangan;
-CREATE POLICY "User login dapat membatalkan peminjaman"
+DROP POLICY IF EXISTS "Pengguna dapat membatalkan peminjaman" ON public.peminjaman_ruangan;
+CREATE POLICY "Pengguna dapat membatalkan peminjaman"
 ON public.peminjaman_ruangan
 FOR UPDATE
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 

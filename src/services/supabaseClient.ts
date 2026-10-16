@@ -8,17 +8,21 @@ let cachedClient: SupabaseClient | null = null;
 let cachedUrl = '';
 let cachedKey = '';
 
-export function getSupabaseCredentials(): { url: string; key: string } {
-  // Check env first, then localStorage
-  const envUrl = (import.meta.env.VITE_SUPABASE_URL as string) || '';
-  const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '';
+const DEFAULT_PROJECT_URL = 'https://whnvdgrtefntxyllehkd.supabase.co';
+const DEFAULT_PROJECT_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobnZkZ3J0ZWZudHh5bGxlaGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzUyMjgsImV4cCI6MjEwNzcxMTIyOH0.BpUDk7UUkbdcZ0zts6XYAsNbSpGWShTittSAD_4ihn8';
 
+export function getSupabaseCredentials(): { url: string; key: string } {
+  // Check localStorage first (user custom overrides), then env, then project defaults
   const storedUrl = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_URL) || '' : '';
   const storedKey = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_KEY) || '' : '';
 
+  const envUrl = (import.meta.env.VITE_SUPABASE_URL as string) || '';
+  const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '';
+
   return {
-    url: storedUrl || envUrl,
-    key: storedKey || envKey,
+    url: storedUrl || envUrl || DEFAULT_PROJECT_URL,
+    key: storedKey || envKey || DEFAULT_PROJECT_KEY,
   };
 }
 
@@ -75,10 +79,16 @@ export async function checkSupabaseConnection(): Promise<{ success: boolean; mes
     // Attempt a light select to test connectivity
     const { error } = await client.from('peminjaman_ruangan').select('id').limit(1);
     if (error) {
-      if (error.code === '42P01') {
+      if (
+        error.code === '42P01' ||
+        error.code === 'PGRST205' ||
+        error.message?.includes('schema cache') ||
+        error.message?.includes('peminjaman_ruangan')
+      ) {
         return {
           success: false,
-          message: 'Tabel "peminjaman_ruangan" belum dibuat di Supabase. Silakan jalankan skrip SQL di Supabase SQL Editor.',
+          message:
+            'Koneksi Supabase aktif, namun tabel "peminjaman_ruangan" belum dibuat. Buka tab Skrip SQL & jalankan skrip di Supabase SQL Editor.',
         };
       }
       return {
@@ -146,16 +156,9 @@ export async function insertBooking(
     };
   }
 
-  // Check if session exists (RLS requires authenticated user for insert)
+  // Check if session exists (attach user_id if logged in)
   const { data: sessionData } = await client.auth.getSession();
   const session = sessionData?.session;
-
-  if (!session) {
-    return {
-      success: false,
-      error: 'Anda harus login terlebih dahulu sebelum mengajukan peminjaman ruangan.',
-    };
-  }
 
   try {
     const { data, error } = await client
@@ -169,12 +172,22 @@ export async function insertBooking(
         jam_selesai: bookingData.jam_selesai,
         keperluan: bookingData.keperluan.trim(),
         status: 'aktif',
-        user_id: session.user.id,
+        user_id: session?.user?.id || null,
       })
       .select()
       .single();
 
     if (error) {
+      if (
+        error.code === '42501' ||
+        error.message?.includes('violates row-level security policy')
+      ) {
+        return {
+          success: false,
+          error:
+            'Kebijakan database mengharuskan Anda untuk login terlebih dahulu sebelum mengajukan peminjaman.',
+        };
+      }
       // If triggered by our custom check_peminjaman_bentrok trigger
       if (error.message.includes('Bentrok!') || error.message.includes('sudah dipinjam')) {
         return {
